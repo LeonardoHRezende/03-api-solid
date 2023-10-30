@@ -11,7 +11,7 @@ export async function register(request: FastifyRequest, reply: FastifyReply) {
   const registerBodySchema = z.object({
     name: z.string(),
     email: z.string().email(),
-    password: z.string().min(8).max(255)
+    password: z.string().min(6).max(255)
   })
 
   const { name, email, password } = registerBodySchema.parse(request.body);
@@ -26,7 +26,7 @@ export async function register(request: FastifyRequest, reply: FastifyReply) {
       });
     }
 
-    return reply.status(500).send();
+    throw err;
   }
 
   return reply.status(201).send();
