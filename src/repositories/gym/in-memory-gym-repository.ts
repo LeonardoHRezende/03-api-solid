@@ -1,7 +1,8 @@
 import { Gym, Prisma } from "@prisma/client";
-import { GymRepository } from "./gym-repository";
+import { FindNearByParams, GymRepository } from "./gym-repository";
 import { randomUUID } from "node:crypto";
 import { Decimal } from "@prisma/client/runtime/library";
+import { calculateDistanceWithCoordinates } from "@/utils/calculcate-distance-with-cordinates";
 
 
 export class InMemoryGymRepository implements GymRepository {
@@ -28,5 +29,22 @@ export class InMemoryGymRepository implements GymRepository {
     if (!gym) return null;
 
     return gym;
+  }
+
+  async searchMany(query: string, page: number) {
+    const gyms = this.gyms.filter((gym) => gym.title.includes(query)).slice((page - 1) * 20, page * 20);
+
+    return gyms;
+  }
+
+  async findNearBy({ latitude, longitude }: FindNearByParams) {
+
+    return this.gyms.filter((gym) => {
+      const distance = calculateDistanceWithCoordinates({latitude, longitude}, {latitude: gym.latitude.toNumber(), longitude: gym.longitude.toNumber()});
+
+      const MAX_DISTANCE_KILOMETERS = 10;
+
+      return distance < MAX_DISTANCE_KILOMETERS;
+    });
   }
 }

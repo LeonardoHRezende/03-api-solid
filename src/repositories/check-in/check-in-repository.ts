@@ -2,6 +2,8 @@ import { CheckIn, Prisma } from "@prisma/client";
 
 export interface CheckInRepository {
   create: (data: Prisma.CheckInUncheckedCreateInput) => Promise<CheckIn>;
-  find: (data: Prisma.CheckInWhereUniqueInput, date: Date) => Promise<CheckIn | null>;
+  find: (data: Prisma.CheckInWhereUniqueInput, date?: Date) => Promise<CheckIn | null>;
   findMany: (data: Prisma.CheckInWhereUniqueInput, page: number) => Promise<CheckIn[]>;
+  count(data: Prisma.CheckInWhereUniqueInput): Promise<number>;
+  save(checkIn: CheckIn): Promise<CheckIn>;
 }

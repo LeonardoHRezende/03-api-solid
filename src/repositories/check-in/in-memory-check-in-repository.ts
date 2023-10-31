@@ -21,26 +21,50 @@ export class InMemoryCheckInRepository implements CheckInRepository {
     return checkIn;
   }
 
-  async find(data: Prisma.CheckInWhereUniqueInput, date: Date) {
-    const startOfTheDay = dayjs(date).startOf('date');
-    const endOfTheDay = dayjs(date).endOf('date');
+  async find(data: Prisma.CheckInWhereUniqueInput, date?: Date) {
+    if (date) {
+      const startOfTheDay = dayjs(date).startOf('date');
+      const endOfTheDay = dayjs(date).endOf('date');
 
-    const checkInOnSameDay = this.checkIns.find(checkIn => {
-      const checkInDate = dayjs(checkIn.created_at);
-      const inOnSameDate = checkInDate.isAfter(startOfTheDay) && checkInDate.isBefore(endOfTheDay);
+      const checkInOnSameDay = this.checkIns.find(checkIn => {
+        const checkInDate = dayjs(checkIn.created_at);
+        const inOnSameDate = checkInDate.isAfter(startOfTheDay) && checkInDate.isBefore(endOfTheDay);
 
-      return checkIn.user_id === data.user_id && checkIn.gym_id === data.gym_id && inOnSameDate;
-    })
+        return checkIn.user_id === data.user_id && checkIn.gym_id === data.gym_id && inOnSameDate;
+      })
 
-    if (!checkInOnSameDay) return null;
+      if (!checkInOnSameDay) return null;
 
-    return checkInOnSameDay;
+      return checkInOnSameDay;
+    }
+
+    const checkIn = this.checkIns.find(checkIn => checkIn.id === data.id);
+
+    if (!checkIn) return null;
+
+    return checkIn;
   }
 
   async findMany(data: Prisma.CheckInWhereUniqueInput, page: number) {
 
     return this.checkIns
       .filter(checkIn => checkIn.user_id === data.user_id)
-      .slice((page - 1) * 20, 40)
+      .slice((page - 1) * 20, page * 20)
+  }
+
+  async count(data: Prisma.CheckInWhereUniqueInput) {
+    return this.checkIns
+      .filter(checkIn => checkIn.user_id === data.user_id)
+      .length;
+  }
+
+  async save(checkIn: CheckIn) {
+    const checkInIndex = this.checkIns.findIndex(item => item.id === checkIn.id);
+
+    if (checkInIndex >= 0) {
+      this.checkIns[checkInIndex] = checkIn;
+    }
+
+    return checkIn;
   }
 }
