@@ -9,7 +9,7 @@ export class InMemoryGymRepository implements GymRepository {
 
   async create(data: Prisma.GymCreateInput) {
     const gym = {
-      id: '123',
+      id: data.id ?? randomUUID(),
       title: data.title,
       phone: data.phone || null,
       description: data.description || null,
