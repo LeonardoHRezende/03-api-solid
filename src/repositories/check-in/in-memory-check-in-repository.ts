@@ -36,4 +36,11 @@ export class InMemoryCheckInRepository implements CheckInRepository {
 
     return checkInOnSameDay;
   }
+
+  async findMany(data: Prisma.CheckInWhereUniqueInput, page: number) {
+
+    return this.checkIns
+      .filter(checkIn => checkIn.user_id === data.user_id)
+      .slice((page - 1) * 20, 40)
+  }
 }
