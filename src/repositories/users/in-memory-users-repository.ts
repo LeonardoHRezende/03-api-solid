@@ -19,7 +19,7 @@ export class InMemoryUsersRepository implements UsersRepository {
   }
 
   async find(data: Prisma.UserWhereUniqueInput) {
-    const user = this.users.find(user => user.email === data.email);
+    const user = this.users.find(user => user.email === data.email || user.id === data.id);
     if (!user) {
       return null;
     }
